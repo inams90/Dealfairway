@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-deep: #143D30;
+  --color-brand-fairway: #4E8A2E;
+  --color-brand-cream: #F8F5EF;
+  --color-brand-red: #D23A2A;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-brand-cream text-brand-deep antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
