@@ -63,3 +63,35 @@ export const ChevronLeftIcon = (p: IconProps) => (
     <path d="m15 6-6 6 6 6" />
   </Icon>
 )
+export const PhoneIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+  </Icon>
+)
+export const MessageIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 5h16v11H8l-4 4z" />
+  </Icon>
+)
+export const MailIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m3 7 9 6 9-6" />
+  </Icon>
+)
+export const PlusIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 5v14M5 12h14" />
+  </Icon>
+)
+export const SearchIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </Icon>
+)
+export const FilterIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 5h16M7 12h10M10 19h4" />
+  </Icon>
+)

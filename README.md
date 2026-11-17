@@ -43,6 +43,15 @@ password resets come back to the app.
 | `npm run test:e2e` | Playwright end-to-end tests on a phone-sized browser. Supabase is faked, so no project is needed. |
 | `npm run build` | Type-check and production build. |
 
+## Importing your existing clients
+
+In the app: **More → Import contacts**, choose the CSV exported from your old CRM, check the
+column matches, review duplicates, then import. Your CSV stays on your device until you
+confirm, and goes only to your own Supabase project. **Never commit client CSV files to this repo.**
+
+Per the Phase 1 plan, import real clients into **dealfairway-prod** once it exists
+(Prompt 19). The dev project is for made-up test contacts.
+
 ## Deploying
 
 See [docs/deploy-cloudflare.md](docs/deploy-cloudflare.md).

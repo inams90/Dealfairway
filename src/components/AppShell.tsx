@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Logo } from './Logo'
+import { HeaderLogo } from './Logo'
 import { ClientsIcon, HomeIcon, InquiriesIcon, MoreIcon, TasksIcon } from './icons'
 
 export const tabs = [
@@ -15,7 +15,7 @@ export function AppShell() {
     <div className="flex min-h-full flex-col">
       <header className="sticky top-0 z-10 bg-brand-deep pt-[env(safe-area-inset-top)] text-brand-cream shadow">
         <div className="mx-auto flex h-14 max-w-2xl items-center px-4">
-          <Logo className="text-lg [&_span_span]:text-[#9cc97f]" />
+          <HeaderLogo />
         </div>
       </header>
 

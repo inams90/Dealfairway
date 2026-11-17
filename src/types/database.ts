@@ -42,6 +42,8 @@ export type ContactRow = {
   source: ContactSource
   notes: string
   tags: string[]
+  /** Maintained by a trigger on activity_log. */
+  last_activity_at: string | null
 } & Timestamps
 
 export type InquiryRow = {

@@ -120,4 +120,30 @@ describe.skipIf(!adminUrl)('Row Level Security', () => {
       )
     }
   })
+
+  it("keeps a contact's last_activity_at in step with its newest activity", async () => {
+    const contactId = await asUser(db, userB, async () =>
+      (await db.query<{ id: string }>(`insert into contacts (first_name) values ('Fresh') returning id`)).rows[0].id,
+    )
+    const last = async () =>
+      (await asUser(db, userB, () => db.query(`select last_activity_at from contacts where id = $1`, [contactId])))
+        .rows[0].last_activity_at as Date | null
+    expect(await last()).toBeNull()
+
+    const ids = await asUser(db, userB, async () => {
+      const r = await db.query<{ id: string }>(
+        `insert into activity_log (contact_id, kind, occurred_at) values
+           ($1, 'note', '2026-01-01T12:00:00Z'), ($1, 'meeting', '2026-06-01T12:00:00Z') returning id`,
+        [contactId],
+      )
+      return r.rows.map((x) => x.id)
+    })
+    expect((await last())!.toISOString()).toBe('2026-06-01T12:00:00.000Z')
+
+    await asUser(db, userB, () => db.query(`delete from activity_log where id = $1`, [ids[1]]))
+    expect((await last())!.toISOString()).toBe('2026-01-01T12:00:00.000Z')
+
+    await asUser(db, userB, () => db.query(`delete from activity_log where id = $1`, [ids[0]]))
+    expect(await last()).toBeNull()
+  })
 })

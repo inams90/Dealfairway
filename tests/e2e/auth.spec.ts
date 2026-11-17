@@ -12,7 +12,7 @@ test('smoke: the login page loads with the DealFairway brand', async ({ page }) 
   await page.goto('/')
   await expect(page).toHaveURL(/\/login$/)
   await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
-  await expect(page.getByText('DealFairway', { exact: true })).toBeVisible()
+  await expect(page.getByRole('img', { name: 'DealFairway' })).toBeVisible()
 })
 
 test('sign up creates an account and opens the dashboard', async ({ page }) => {
@@ -87,5 +87,5 @@ test('profile page saves brokerage and RECO number', async ({ page }) => {
   await page.getByLabel('RECO registration number (optional)').fill('1234567')
   await page.getByRole('button', { name: 'Save profile' }).click()
   await expect(page.getByText('Profile saved.')).toBeVisible()
-  expect(fake.profiles.get(user.id)).toMatchObject({ brokerage: 'Fairway Realty Inc., Brokerage', reco_number: '1234567' })
+  expect(fake.profile(user.id)).toMatchObject({ brokerage: 'Fairway Realty Inc., Brokerage', reco_number: '1234567' })
 })

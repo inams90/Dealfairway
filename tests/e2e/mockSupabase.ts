@@ -10,13 +10,30 @@ type FakeUser = { id: string; email: string; password: string; full_name: string
 
 export class FakeSupabase {
   users: FakeUser[] = []
-  profiles = new Map<string, Record<string, unknown>>()
+  tables = new Map<string, Row[]>()
   calls: string[] = []
+
+  table(name: string): Row[] {
+    if (!this.tables.has(name)) this.tables.set(name, [])
+    return this.tables.get(name)!
+  }
+
+  profile(userId: string) {
+    return this.table('profiles').find((p) => p.user_id === userId)
+  }
+
+  /** Seeds a contact owned by the given user (made-up data only). */
+  addContact(userId: string, contact: Row) {
+    const now = new Date().toISOString()
+    const row = withDefaults('contacts', { id: crypto.randomUUID(), user_id: userId, created_at: now, updated_at: now, ...contact })
+    this.table('contacts').push(row)
+    return row
+  }
 
   addUser(email: string, password: string, full_name = 'Test Agent') {
     const user = { id: crypto.randomUUID(), email, password, full_name }
     this.users.push(user)
-    this.profiles.set(user.id, this.newProfile(user))
+    this.table('profiles').push(this.newProfile(user))
     return user
   }
 
@@ -91,22 +108,46 @@ export class FakeSupabase {
       return user ? json(200, this.publicUser(user)) : json(401, { message: 'not signed in' })
     }
 
-    // ---- REST: profiles
-    if (url.pathname === '/rest/v1/profiles') {
+    // ---- REST: a tiny generic PostgREST for our tables, scoped to the signed-in user (like RLS)
+    const table = url.pathname.match(/^\/rest\/v1\/(\w+)$/)?.[1]
+    if (table) {
       const user = this.userFromRequest(route)
       if (!user) return json(401, { message: 'JWT required' })
-      const wantsObject = (req.headers()['accept'] ?? '').includes('vnd.pgrst.object')
-      if (method === 'GET') {
-        const p = this.profiles.get(user.id)
-        return json(200, wantsObject ? p : p ? [p] : [])
+      const headers = req.headers()
+      const wantsObject = (headers['accept'] ?? '').includes('vnd.pgrst.object')
+      const wantsRows = (headers['prefer'] ?? '').includes('return=representation')
+      const rows = this.table(table)
+      const mine = rows.filter((r) => r.user_id === user.id)
+      const matches = (r: Row) => matchesFilters(r, url.searchParams)
+      const respond = (status: number, result: Row[]) => {
+        if (wantsObject) return result.length === 1 ? json(status, result[0]) : json(406, { message: 'not one row' })
+        return json(status, result)
       }
+
+      if (method === 'GET') return respond(200, sortRows(mine.filter(matches), url.searchParams.get('order')))
       if (method === 'POST') {
-        const body = req.postDataJSON() as Record<string, unknown>
-        const row = Array.isArray(body) ? body[0] : body
-        if (row.user_id !== user.id) return json(403, { message: 'new row violates row-level security policy' })
-        const merged = { ...this.profiles.get(user.id), ...row, updated_at: new Date().toISOString() }
-        this.profiles.set(user.id, merged)
-        return json(201, wantsObject ? merged : [merged])
+        const body = req.postDataJSON() as Row | Row[]
+        const now = new Date().toISOString()
+        const key = table === 'profiles' ? 'user_id' : 'id'
+        const saved = (Array.isArray(body) ? body : [body]).map((input) => {
+          const row: Row = { id: crypto.randomUUID(), created_at: now, ...input, user_id: input.user_id ?? user.id, updated_at: now }
+          if (row.user_id !== user.id) throw new Error('rls')
+          const existing = rows.findIndex((r) => r[key] === row[key])
+          if (existing >= 0) rows[existing] = { ...rows[existing], ...row }
+          else rows.push(withDefaults(table, row))
+          return rows.find((r) => r[key] === row[key])!
+        })
+        return wantsRows || wantsObject ? respond(201, saved) : route.fulfill({ status: 201, headers: corsHeaders })
+      }
+      if (method === 'PATCH') {
+        const patch = req.postDataJSON() as Row
+        const updated = mine.filter(matches).map((r) => Object.assign(r, patch, { updated_at: new Date().toISOString() }))
+        return wantsRows || wantsObject ? respond(200, updated) : route.fulfill({ status: 204, headers: corsHeaders })
+      }
+      if (method === 'DELETE') {
+        const doomed = new Set(mine.filter(matches))
+        this.tables.set(table, rows.filter((r) => !doomed.has(r)))
+        return route.fulfill({ status: 204, headers: corsHeaders })
       }
     }
 
@@ -118,4 +159,47 @@ const corsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-headers': '*',
   'access-control-allow-methods': '*',
+}
+
+type Row = Record<string, unknown>
+
+const DEFAULTS: Record<string, Row> = {
+  contacts: {
+    first_name: '', last_name: '', email: null, phone: null, type: 'other', property_interest: null,
+    source: 'other', notes: '', tags: [], last_activity_at: null,
+  },
+}
+
+function withDefaults(table: string, row: Row): Row {
+  return { ...(DEFAULTS[table] ?? {}), ...row }
+}
+
+/** Supports the PostgREST filters our app uses: col=eq.x, col=is.null, col=in.(a,b). */
+function matchesFilters(row: Row, params: URLSearchParams) {
+  for (const [key, raw] of params) {
+    if (['select', 'order', 'limit', 'offset', 'on_conflict', 'columns'].includes(key)) continue
+    const [op, ...rest] = raw.split('.')
+    const value = rest.join('.')
+    const actual = row[key]
+    if (op === 'eq' && String(actual) !== value) return false
+    if (op === 'is' && value === 'null' && actual !== null && actual !== undefined) return false
+    if (op === 'in' && !value.replace(/^\(|\)$/g, '').split(',').includes(String(actual))) return false
+  }
+  return true
+}
+
+function sortRows(rows: Row[], order: string | null) {
+  if (!order) return rows
+  const keys = order.split(',').map((o) => {
+    const [col, dir] = o.split('.')
+    return { col, desc: dir === 'desc' }
+  })
+  return [...rows].sort((a, b) => {
+    for (const { col, desc } of keys) {
+      const x = String(a[col] ?? '')
+      const y = String(b[col] ?? '')
+      if (x !== y) return (x < y ? -1 : 1) * (desc ? -1 : 1)
+    }
+    return 0
+  })
 }

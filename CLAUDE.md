@@ -19,8 +19,13 @@ Vitest for unit tests, Playwright for end-to-end tests.
   Never edit a migration that has already been applied to prod — add a new one.
 - Mobile-first design: every screen must work one-handed on a phone (primary actions
   in the bottom half, tap targets at least 44px).
-- Brand: deep green `#143D30`, fairway green `#4E8A2E`, cream `#F8F5EF`, accent red `#D23A2A`.
-  Use the Tailwind tokens `brand-deep`, `brand-fairway`, `brand-cream`, `brand-red`.
+- Brand (from the official logo kit, `docs/brand/colour-specifications.txt`): Forest `#143D31`,
+  Grass `#568238`, Ivory `#F8F6EF`, Red `#C43C34`. Use the Tailwind tokens `brand-deep`,
+  `brand-fairway`, `brand-cream`, `brand-red`.
+- Logos live in `public/brand/` (wordmark.svg for light backgrounds, mark-white.svg for the
+  dark top bar) and app icons in `public/icons/`. Do not redraw or recolour them.
+- Real client data (e.g. CRM CSV exports) must never be committed to git or put in test
+  fixtures; tests use made-up contacts only.
 - Plain names in the UI, except "Caddie" (AI assistant) and "Fairway" (deal progress).
 - Write tests for each new feature and run them before saying a task is done.
 - Explain what you changed in plain language at the end of each task.
@@ -41,6 +46,8 @@ Vitest for unit tests, Playwright for end-to-end tests.
 - `npm run build` — type-check and production build
 
 ## Decisions log
+- 2026-11-17: Brand colours updated to the logo kit's exact values (they replace the slightly
+  different values in the original plan).
 - 2026-11-17: Tailwind v4 via `@tailwindcss/vite`; brand colours defined with `@theme`.
 - 2026-11-17: A `profiles` row is created by a database trigger on `auth.users` insert,
   so it exists even if the browser closes right after sign-up.

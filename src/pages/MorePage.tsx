@@ -5,7 +5,7 @@ import { ChevronRightIcon } from '../components/icons'
 
 const items = [
   { to: '/more/profile', label: 'Profile', ready: true },
-  { to: '#', label: 'Import contacts', ready: false },
+  { to: '/more/import', label: 'Import contacts', ready: true },
   { to: '#', label: 'Settings', ready: false },
   { to: '#', label: 'Install DealFairway', ready: false },
 ]

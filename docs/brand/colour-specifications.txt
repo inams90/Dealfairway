@@ -1,0 +1,19 @@
+DealFairway colour specifications
+
+Use HEX for digital artwork. Use the fixed CMYK ink builds below for print.
+CMYK values are percentages in cyan / magenta / yellow / black order.
+
+Forest  #143D31    67 / 0 / 20 / 76
+Grass   #568238    34 / 0 / 57 / 49
+Red     #C43C34    0 / 69 / 73 / 23
+Ivory   #F8F6EF    0 / 1 / 4 / 3
+White   #FFFFFF    0 / 0 / 0 / 0
+
+The website flag is 25% larger than the standard flag.
+The tiny mark uses one larger window and a thicker pole.
+The PNG social avatar is padded for circular crops.
+Solid White PNG and SVG are transparent. Preview them on a dark field.
+The Solid White PDF uses 0% process ink. For white ink on dark stock,
+give your printer the vector art and request their white spot-ink setup.
+Ask your printer for a colour proof on your chosen paper.
+For embroidery, have the shop digitize the one-colour vector and run a stitch proof.

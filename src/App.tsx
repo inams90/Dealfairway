@@ -8,6 +8,9 @@ import { TasksPage } from './pages/TasksPage'
 import { InquiriesPage } from './pages/InquiriesPage'
 import { MorePage } from './pages/MorePage'
 import { ProfilePage } from './pages/ProfilePage'
+import { ContactDetailPage } from './pages/ContactDetailPage'
+import { ContactFormPage } from './pages/ContactFormPage'
+import { ImportContactsPage } from './pages/ImportContactsPage'
 import { LoginPage } from './pages/auth/LoginPage'
 import { SignUpPage } from './pages/auth/SignUpPage'
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
@@ -26,10 +29,14 @@ export function AppRoutes() {
         <Route element={<AppShell />}>
           <Route index element={<HomePage />} />
           <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/clients/new" element={<ContactFormPage />} />
+          <Route path="/clients/:id" element={<ContactDetailPage />} />
+          <Route path="/clients/:id/edit" element={<ContactFormPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/inquiries" element={<InquiriesPage />} />
           <Route path="/more" element={<MorePage />} />
           <Route path="/more/profile" element={<ProfilePage />} />
+          <Route path="/more/import" element={<ImportContactsPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

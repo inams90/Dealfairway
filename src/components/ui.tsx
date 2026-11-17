@@ -1,4 +1,6 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
+import { Link } from 'react-router-dom'
+import { ChevronLeftIcon } from './icons'
 
 export function PageTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
   return (
@@ -60,5 +62,89 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
       <p className="font-semibold">{title}</p>
       {children && <div className="mt-1 text-sm text-brand-deep/70">{children}</div>}
     </div>
+  )
+}
+
+const inputClass =
+  'block w-full rounded-xl border border-brand-deep/20 bg-white px-3 text-base outline-none focus:border-brand-fairway focus:ring-2 focus:ring-brand-fairway/30'
+
+type SelectFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
+  label: string
+  options: { value: string; label: string }[]
+  placeholder?: string
+}
+
+export function SelectField({ label, options, placeholder, id, ...props }: SelectFieldProps) {
+  const inputId = id ?? props.name
+  return (
+    <div className="space-y-1">
+      <label htmlFor={inputId} className="block text-sm font-medium">
+        {label}
+      </label>
+      <select id={inputId} className={`${inputClass} min-h-12`} {...props}>
+        {placeholder !== undefined && <option value="">{placeholder}</option>}
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+type TextAreaFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }
+
+export function TextAreaField({ label, id, ...props }: TextAreaFieldProps) {
+  const inputId = id ?? props.name
+  return (
+    <div className="space-y-1">
+      <label htmlFor={inputId} className="block text-sm font-medium">
+        {label}
+      </label>
+      <textarea id={inputId} rows={4} className={`${inputClass} py-2`} {...props} />
+    </div>
+  )
+}
+
+export function BackLink({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <Link to={to} className="mb-1 inline-flex min-h-11 items-center gap-1 text-sm text-brand-deep/70">
+      <ChevronLeftIcon width={18} height={18} /> {children}
+    </Link>
+  )
+}
+
+export function Card({ title, children, action }: { title?: string; children: ReactNode; action?: ReactNode }) {
+  return (
+    <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-brand-deep/5">
+      {(title || action) && (
+        <div className="mb-2 flex items-center justify-between">
+          {title && <h2 className="font-semibold">{title}</h2>}
+          {action}
+        </div>
+      )}
+      {children}
+    </section>
+  )
+}
+
+export function Chip({ children, tone = 'plain' }: { children: ReactNode; tone?: 'plain' | 'green' | 'red' }) {
+  const styles = {
+    plain: 'bg-brand-deep/5 text-brand-deep/80',
+    green: 'bg-brand-fairway/15 text-brand-deep',
+    red: 'bg-brand-red/10 text-brand-red',
+  }[tone]
+  return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${styles}`}>{children}</span>
+}
+
+export function Avatar({ text }: { text: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-deep text-sm font-semibold text-brand-cream"
+    >
+      {text}
+    </span>
   )
 }

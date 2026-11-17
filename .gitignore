@@ -10,3 +10,7 @@ coverage
 supabase/.temp
 supabase/.branches
 .DS_Store
+
+# Client data exports must never be committed (test fixtures are made-up)
+*.csv
+!tests/e2e/fixtures/*.csv

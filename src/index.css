@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-deep: #143D30;
-  --color-brand-fairway: #4E8A2E;
-  --color-brand-cream: #F8F5EF;
-  --color-brand-red: #D23A2A;
+  --color-brand-deep: #143D31;
+  --color-brand-fairway: #568238;
+  --color-brand-cream: #F8F6EF;
+  --color-brand-red: #C43C34;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
